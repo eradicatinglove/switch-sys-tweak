@@ -43,13 +43,16 @@ jobs:
           make -C /tmp/libnx install -j4
       - name: deps - ams libs
         run: |
+          # Build libstratosphere (produces libstratosphere.a)
           make -C atmosphere/libraries/libstratosphere -j4
-          make -C atmosphere/libraries/libvapours -j4
+          # Create directories for headers and libraries
           mkdir -p lib/ams/libstratosphere/include lib/ams/libvapours/include
+          # Copy libstratosphere headers and library
           cp -r atmosphere/libraries/libstratosphere/include/* lib/ams/libstratosphere/include/
-          cp -r atmosphere/libraries/libvapours/include/* lib/ams/libvapours/include/
           cp -r atmosphere/libraries/libstratosphere/out/nintendo_nx_arm64_armv8a/release/libstratosphere.a lib/ams/libstratosphere/
-          cp -r atmosphere/libraries/libvapours/out/nintendo_nx_arm64_armv8a/release/libvapours.a lib/ams/libvapours/
+          # Copy libvapours headers (header-only, no libvapours.a)
+          cp -r atmosphere/libraries/libvapours/include/* lib/ams/libvapours/include/
+          # Verify copied files
           ls -la lib/ams/libstratosphere
           ls -la lib/ams/libvapours
       - name: build - FEAT_ALL
