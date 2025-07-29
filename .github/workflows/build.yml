@@ -11,6 +11,8 @@ jobs:
         run: |
           cat /proc/cpuinfo
           free -m
+          pwd
+          ls -la
       - name: checkout - project
         uses: actions/checkout@v4
         with:
@@ -23,6 +25,17 @@ jobs:
           ref: 1.9.2
           path: atmosphere
           submodules: recursive
+      - name: verify - atmosphere checkout
+        run: |
+          ls -la atmosphere
+          if [ ! -d "atmosphere/libstratosphere" ]; then
+            echo "Error: atmosphere/libstratosphere directory not found"
+            exit 1
+          fi
+          if [ ! -d "atmosphere/libvapours" ]; then
+            echo "Error: atmosphere/libvapours directory not found"
+            exit 1
+          fi
       - name: deps - libnx
         run: |
           git clone https://github.com/switchbrew/libnx.git /tmp/libnx
@@ -36,6 +49,8 @@ jobs:
           cp -r atmosphere/libvapours/include/* lib/ams/libvapours/include/
           cp -r atmosphere/libstratosphere/out/nintendo_nx_arm64_armv8a/release/libstratosphere.a lib/ams/libstratosphere/
           cp -r atmosphere/libvapours/out/nintendo_nx_arm64_armv8a/release/libvapours.a lib/ams/libvapours/
+          ls -la lib/ams/libstratosphere
+          ls -la lib/ams/libvapours
       - name: build - FEAT_ALL
         run: |
           make clean
