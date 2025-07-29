@@ -16,14 +16,26 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+      - name: checkout - atmosphere
+        uses: actions/checkout@v4
+        with:
+          repository: Atmosphere-NX/Atmosphere
+          ref: 1.9.2
+          path: atmosphere
+          submodules: recursive
       - name: deps - libnx
         run: |
           git clone https://github.com/switchbrew/libnx.git /tmp/libnx
           make -C /tmp/libnx install -j4
       - name: deps - ams libs
         run: |
-          make -C lib/ams/libstratosphere -j4
-
+          make -C atmosphere/libstratosphere -j4
+          make -C atmosphere/libvapours -j4
+          mkdir -p lib/ams/libstratosphere/include lib/ams/libvapours/include
+          cp -r atmosphere/libstratosphere/include/* lib/ams/libstratosphere/include/
+          cp -r atmosphere/libvapours/include/* lib/ams/libvapours/include/
+          cp -r atmosphere/libstratosphere/out/nintendo_nx_arm64_armv8a/release/libstratosphere.a lib/ams/libstratosphere/
+          cp -r atmosphere/libvapours/out/nintendo_nx_arm64_armv8a/release/libvapours.a lib/ams/libvapours/
       - name: build - FEAT_ALL
         run: |
           make clean
@@ -33,7 +45,6 @@ jobs:
         with:
           name: sys-tweak.nsp
           path: out/sys-tweak.nsp
-
       - name: build - FEAT_ALL TOGL_LOGGING
         run: |
           make clean
